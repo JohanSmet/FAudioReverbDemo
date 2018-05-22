@@ -1,0 +1,11 @@
+visualc/FAudioReverbDemo.VC.db
+visualc/FAudioReverbDemo.VC.VC.opendb
+visualc/*.filters
+visualc/*.user
+visualc/.vs/
+visualc/Debug/
+visualc/Release/
+visualc/x64/
+imgui.ini
+SDL2.dll
+*.o
