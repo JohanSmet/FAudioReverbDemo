@@ -70,12 +70,6 @@ void main_gui()
 			2000.0f,
 			50.0f,
 			100.0f,
-			31.71f,
-			37.11f,
-			40.23f,
-			0.7f,
-			44.14f,
-			0.7f,
 			13.28f,
 			28.13f,
 			13.28f,
@@ -122,13 +116,6 @@ void main_gui()
 
 		update_effect |= ImGui::SliderFloat("Density (%)", &reverb_params.Density, 0, 100);
 		update_effect |= ImGui::SliderFloat("RoomSize (feet)", &reverb_params.RoomSize, 1, 100);
-
-		update_effect |= ImGui::SliderFloat("Comb1Delay", &reverb_params.Comb1Delay, 0.0f, 100.0f);
-		update_effect |= ImGui::SliderFloat("Comb2Delay", &reverb_params.Comb2Delay, 0.0f, 100.0f);
-		update_effect |= ImGui::SliderFloat("LPFComb1Delay", &reverb_params.LPFComb1Delay, 0.0f, 100.0f);
-		update_effect |= ImGui::SliderFloat("LPFComb1Gain", &reverb_params.LPFComb1Gain, -1.0f, 1.0f);
-		update_effect |= ImGui::SliderFloat("LPFComb2Delay", &reverb_params.LPFComb2Delay, 0.0f, 100.0f);
-		update_effect |= ImGui::SliderFloat("LPFComb2Gain", &reverb_params.LPFComb2Gain, -1.0f, 1.0f);
 
 		update_effect |= ImGui::SliderFloat("InDiffusionLength1 (ms)", &reverb_params.InDiffusionLength1, 0, 100);
 		update_effect |= ImGui::SliderFloat("InDiffusionLength2 (ms)", &reverb_params.InDiffusionLength2, 0, 100);
