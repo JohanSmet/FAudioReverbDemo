@@ -3,7 +3,7 @@
 #define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 
-#include <faudiofx.h>
+#include <FAudioFX.h>
 
 const char *audio_sample_filenames[] =
 {
