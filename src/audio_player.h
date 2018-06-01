@@ -41,13 +41,22 @@ class AudioPlayer
 			audio_wave_play(m_context);
 		}
 
-		void change_effect(bool p_enabled, ReverbI3DL2Parameters *p_params)
+		void change_effect(bool p_enabled, ReverbParameters *p_params)
 		{
 			if (m_context == nullptr)
 				return;
 
 			audio_effect_change(m_context, p_enabled, p_params);
 		}
+
+		void change_effect_test(bool p_enabled, ReverbTestParameters *p_params)
+		{
+			if (m_context == nullptr)
+				return;
+
+			audio_effect_change(m_context, p_enabled, (ReverbParameters *) p_params);
+		}
+
 
 	private : 
 		AudioContext *	m_context;

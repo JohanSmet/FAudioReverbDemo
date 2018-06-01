@@ -18,7 +18,6 @@ void main_gui()
 	bool update_wave = false;
 	bool play_wave = false;
 	bool update_effect = false;
-	bool update_reverb = false;
 
 	// gui
 	int window_y = next_window_dims(0, 50);
@@ -52,12 +51,96 @@ void main_gui()
 		update_effect |= ImGui::Checkbox("Enabled", &effect_enabled);
 		
 		static int preset_index = -1;
-		static ReverbI3DL2Parameters reverb_params = audio_reverb_presets[0];
+		static ReverbTestParameters reverb_params = {
+			100.0f,
+			40,
+			60,
+			0, 0, 0, 0, 0,
+			3,
+			3,
+			0,
+			0,
+			0,
+			0,
+			5000.0f,
+			-5.0f,
+			-5.0f,
+			-5.0f,
+			-5.0f,
+			2000.0f,
+			50.0f,
+			100.0f,
+			31.71f,
+			37.11f,
+			40.23f,
+			0.7f,
+			44.14f,
+			0.7f,
+			13.28f,
+			28.13f,
+			13.28f,
+		};
 
 		if (ImGui::Combo("Preset", &preset_index, audio_reverb_preset_names, audio_reverb_preset_count)) {
-			reverb_params = audio_reverb_presets[preset_index];
+			memcpy(&reverb_params, &audio_reverb_presets[preset_index], sizeof(ReverbParameters));
 			update_effect = true;
 		}
+
+	ImGui::End();
+
+	window_y = next_window_dims(window_y, 630);
+	ImGui::Begin("FAudio Tune Detail");
+
+		int ReverbDelay = reverb_params.ReverbDelay;
+		int EarlyDiffusion = reverb_params.EarlyDiffusion;
+		int LateDiffusion = reverb_params.LateDiffusion;
+		int LowEQGain = reverb_params.LowEQGain;
+		int LowEQCutoff = reverb_params.LowEQCutoff;
+		int HighEQGain = reverb_params.HighEQGain;
+		int HighEQCutoff = reverb_params.HighEQCutoff;
+
+		update_effect |= ImGui::SliderFloat("WetDryMix (%)", &reverb_params.WetDryMix, 0, 100);
+		update_effect |= ImGui::SliderInt("ReflectionsDelay (ms)", (int *)&reverb_params.ReflectionsDelay, 0, 300);
+		update_effect |= ImGui::SliderInt("ReverbDelay (ms)", &ReverbDelay, 0, 85);
+
+		update_effect |= ImGui::SliderInt("Early Diffusion", &EarlyDiffusion, 0, 15);
+		update_effect |= ImGui::SliderInt("Late Diffusion", &LateDiffusion, 0, 15);
+
+		update_effect |= ImGui::SliderInt("LowEqGain", &LowEQGain, 0, 12);
+		update_effect |= ImGui::SliderInt("LowEqCuttoff", &LowEQCutoff, 0, 9);
+		update_effect |= ImGui::SliderInt("HighEqGain", &HighEQGain, 0, 8);
+		update_effect |= ImGui::SliderInt("HighEqCuttoff", &HighEQCutoff, 0, 14);
+
+		update_effect |= ImGui::SliderFloat("RoomFreq (Hz)", &reverb_params.RoomFilterFreq, 20, 20000);
+		update_effect |= ImGui::SliderFloat("RoomGain (dB)", &reverb_params.RoomFilterMain, -100, 0);
+		update_effect |= ImGui::SliderFloat("RoomHFGain (dB)", &reverb_params.RoomFilterHF, -100, 0);
+
+		update_effect |= ImGui::SliderFloat("ReflectionsGain (dB)", &reverb_params.ReflectionsGain, -100, 20);
+		update_effect |= ImGui::SliderFloat("ReverbGain (dB)", &reverb_params.ReverbGain, -100, 20);
+
+		update_effect |= ImGui::SliderFloat("DecayTime (s)", &reverb_params.DecayTime, 0.1f, 15.0f);
+
+		update_effect |= ImGui::SliderFloat("Density (%)", &reverb_params.Density, 0, 100);
+		update_effect |= ImGui::SliderFloat("RoomSize (feet)", &reverb_params.RoomSize, 1, 100);
+
+		update_effect |= ImGui::SliderFloat("Comb1Delay", &reverb_params.Comb1Delay, 0.0f, 100.0f);
+		update_effect |= ImGui::SliderFloat("Comb2Delay", &reverb_params.Comb2Delay, 0.0f, 100.0f);
+		update_effect |= ImGui::SliderFloat("LPFComb1Delay", &reverb_params.LPFComb1Delay, 0.0f, 100.0f);
+		update_effect |= ImGui::SliderFloat("LPFComb1Gain", &reverb_params.LPFComb1Gain, -1.0f, 1.0f);
+		update_effect |= ImGui::SliderFloat("LPFComb2Delay", &reverb_params.LPFComb2Delay, 0.0f, 100.0f);
+		update_effect |= ImGui::SliderFloat("LPFComb2Gain", &reverb_params.LPFComb2Gain, -1.0f, 1.0f);
+
+		update_effect |= ImGui::SliderFloat("InDiffusionLength1 (ms)", &reverb_params.InDiffusionLength1, 0, 100);
+		update_effect |= ImGui::SliderFloat("InDiffusionLength2 (ms)", &reverb_params.InDiffusionLength2, 0, 100);
+		update_effect |= ImGui::SliderFloat("OutDiffusionLength (ms)", &reverb_params.OutDiffusionLength, 0, 100);
+
+		reverb_params.ReverbDelay = ReverbDelay;
+		reverb_params.EarlyDiffusion = EarlyDiffusion;
+		reverb_params.LateDiffusion = LateDiffusion;
+		reverb_params.LowEQGain = LowEQGain;
+		reverb_params.LowEQCutoff = LowEQCutoff;
+		reverb_params.HighEQGain = HighEQGain;
+		reverb_params.HighEQCutoff = HighEQCutoff;
 
 	ImGui::End();
 
@@ -80,8 +163,13 @@ void main_gui()
 		player.play_wave();
 	}
 
-	if (update_effect | update_wave)
+	if ((update_engine || update_effect) && audio_engine == AudioEngine_XAudio2)
 	{
-		player.change_effect(effect_enabled, &reverb_params);
+		player.change_effect(effect_enabled, (ReverbParameters *) &reverb_params);
+	}
+
+	if ((update_engine || update_effect) && audio_engine == AudioEngine_FAudio)
+	{
+		player.change_effect_test(effect_enabled, &reverb_params);
 	}
 }

@@ -19,7 +19,7 @@ struct AudioContext
 
 	XAUDIO2_EFFECT_DESCRIPTOR reverb_effect;
 	XAUDIO2_EFFECT_CHAIN	  effect_chain;
-	ReverbI3DL2Parameters	  reverb_params;
+	ReverbParameters		  reverb_params;
 	bool					  reverb_enabled;
 };
 
@@ -83,10 +83,13 @@ AudioVoice *xaudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 
 void xaudio_reverb_set_params(AudioContext *context)
 {
-	XAUDIO2FX_REVERB_PARAMETERS native_params = { 0 };
+/*	XAUDIO2FX_REVERB_PARAMETERS native_params = { 0 };
 
-	ReverbConvertI3DL2ToNative((XAUDIO2FX_REVERB_I3DL2_PARAMETERS *)&context->reverb_params, &native_params);
-	HRESULT hr = context->voice->voice->SetEffectParameters(0, &native_params, sizeof(native_params));
+	ReverbConvertI3DL2ToNative((XAUDIO2FX_REVERB_I3DL2_PARAMETERS *)&context->reverb_params, &native_params);*/
+	HRESULT hr = context->voice->voice->SetEffectParameters(
+		0, 
+		&context->reverb_params, 
+		sizeof(XAUDIO2FX_REVERB_PARAMETERS));
 }
 
 void xaudio_create_reverb(AudioVoice *voice)
@@ -165,7 +168,7 @@ void xaudio_wave_play(AudioContext *p_context)
 	p_context->voice->voice->Start();
 }
 
-void xaudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbI3DL2Parameters *p_params)
+void xaudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbParameters *p_params)
 {
 	HRESULT hr;
 

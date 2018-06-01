@@ -17,10 +17,11 @@ struct AudioContext
 
 	struct AudioVoice *voice;
 	FAudioBuffer      buffer;
+	FAudioBuffer	  silence;
 
 	FAudioEffectDescriptor reverb_effect;
 	FAudioEffectChain	   effect_chain;
-	ReverbI3DL2Parameters  reverb_params;
+	ReverbTestParameters   reverb_params;
 	bool				   reverb_enabled;
 };
 
@@ -75,6 +76,25 @@ AudioVoice *faudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 	p_context->buffer.LoopLength = 0;
 	p_context->buffer.LoopCount = 0;
 
+	
+	size_t silence_len = 2 * 48000 * p_num_channels;
+	float *silence_buffer = new float[silence_len];
+	for (uint32_t i = 0; i < silence_len; ++i)
+	{
+		silence_buffer[i] = 0.0f;
+	}
+
+	p_context->silence = { 0 };
+	p_context->silence.AudioBytes = 4 * silence_len;
+	p_context->silence.pAudioData = (uint8_t *)silence_buffer;
+	p_context->silence.Flags = FAUDIO_END_OF_STREAM;
+	p_context->silence.PlayBegin = 0;
+	p_context->silence.PlayLength = silence_len / p_num_channels;
+	p_context->silence.LoopBegin = 0;
+	p_context->silence.LoopLength = 0;
+	p_context->silence.LoopCount = 0;
+
+
 	// return a voice struct
 	AudioVoice *result = new AudioVoice();
 	result->context = p_context;
@@ -84,10 +104,12 @@ AudioVoice *faudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 
 void faudio_reverb_set_params(AudioContext *context)
 {
-	FAudioFXReverbParameters native_params = { 0 };
+/*	FAudioFXReverbParameters native_params = { 0 };
 
 	ReverbConvertI3DL2ToNative((FAudioFXReverbI3DL2Parameters *)&context->reverb_params, &native_params);
 	uint32_t hr = FAudioVoice_SetEffectParameters(context->voice->voice, 0, &native_params, sizeof(native_params), FAUDIO_COMMIT_NOW);
+	*/
+	uint32_t hr = FAudioVoice_SetEffectParameters(context->voice->voice, 0, &context->reverb_params, sizeof(context->reverb_params), FAUDIO_COMMIT_NOW);
 }
 
 void faudio_create_reverb(AudioVoice *voice)
@@ -154,10 +176,11 @@ void faudio_wave_play(AudioContext *p_context)
 	FAudioSourceVoice_FlushSourceBuffers(p_context->voice->voice);
 
 	FAudioSourceVoice_SubmitSourceBuffer(p_context->voice->voice, &p_context->buffer, NULL);
+	FAudioSourceVoice_SubmitSourceBuffer(p_context->voice->voice, &p_context->silence, NULL);
 	FAudioSourceVoice_Start(p_context->voice->voice, 0, FAUDIO_COMMIT_NOW);
 }
 
-void faudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbI3DL2Parameters *p_params)
+void faudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbParameters *p_params)
 {
 	uint32_t hr;
 
@@ -172,7 +195,7 @@ void faudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbI3DL2Pa
 		p_context->reverb_enabled = p_enabled;
 	}
 
-	p_context->reverb_params = *p_params;
+	p_context->reverb_params = *((ReverbTestParameters *) p_params);
 	faudio_reverb_set_params(p_context);
 }
 
@@ -211,7 +234,7 @@ AudioContext *faudio_create_context()
 
 	context->voice = NULL;
 	context->wav_samples = NULL;
-	context->reverb_params = audio_reverb_presets[0];
+	context->reverb_params = { 0 };
 	context->reverb_enabled = false;
 
 	// load the first wave

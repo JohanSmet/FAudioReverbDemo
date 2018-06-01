@@ -3,6 +3,8 @@
 #define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 
+#include <faudiofx.h>
+
 const char *audio_sample_filenames[] =
 {
 	"resources/snaredrum_forte.wav",
@@ -44,7 +46,7 @@ const char *audio_reverb_preset_names[] =
 };
 
 // see xaudio2fx.h
-const ReverbI3DL2Parameters audio_reverb_presets[] = 
+const ReverbI3DL2Parameters audio_reverb_presets_i3dl2[] = 
 {
 	{100, -1000, -100,0.0f, 1.49f,0.83f, -2602,0.007f,   200,0.011f,100.0f,100.0f,5000.0f},
 	{100, -1000,-6000,0.0f, 0.17f,0.10f, -1204,0.001f,   207,0.002f,100.0f,100.0f,5000.0f},
@@ -76,6 +78,7 @@ const ReverbI3DL2Parameters audio_reverb_presets[] =
 	{100, -1000, -600,0.0f, 1.80f,0.70f, -2000,0.030f, -1400,0.060f,100.0f,100.0f,5000.0f},
 	{100, -1000, -200,0.0f, 1.30f,0.90f,     0,0.002f,     0,0.010f,100.0f, 75.0f,5000.0f}
 };
+const ReverbParameters *audio_reverb_presets = NULL;
 
 const size_t audio_reverb_preset_count = sizeof(audio_reverb_preset_names) / sizeof(audio_reverb_preset_names[0]);
 
@@ -95,6 +98,18 @@ extern AudioContext *faudio_create_context();
 
 AudioContext *audio_create_context(AudioEngine p_engine)
 {
+	if (audio_reverb_presets == NULL)
+	{
+		audio_reverb_presets = new ReverbParameters[audio_reverb_preset_count];
+
+		for (int idx = 0; idx < audio_reverb_preset_count; ++idx)
+		{
+			ReverbConvertI3DL2ToNative(
+				(const FAudioFXReverbI3DL2Parameters *) &audio_reverb_presets_i3dl2[idx], 
+				(FAudioFXReverbParameters *) &audio_reverb_presets[idx]);
+		}
+	}
+
 	switch (p_engine)
 	{
 		#ifdef HAVE_XAUDIO2
