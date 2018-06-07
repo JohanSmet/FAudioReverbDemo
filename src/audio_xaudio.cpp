@@ -83,12 +83,12 @@ AudioVoice *xaudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 
 void xaudio_reverb_set_params(AudioContext *context)
 {
-/*	XAUDIO2FX_REVERB_PARAMETERS native_params = { 0 };
+	XAUDIO2FX_REVERB_PARAMETERS native_params = { 0 };
+	memcpy(&native_params, &context->reverb_params, sizeof(ReverbParameters));
 
-	ReverbConvertI3DL2ToNative((XAUDIO2FX_REVERB_I3DL2_PARAMETERS *)&context->reverb_params, &native_params);*/
 	HRESULT hr = context->voice->voice->SetEffectParameters(
 		0, 
-		&context->reverb_params, 
+		&native_params,
 		sizeof(XAUDIO2FX_REVERB_PARAMETERS));
 }
 
@@ -183,7 +183,7 @@ void xaudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbParamet
 		p_context->reverb_enabled = p_enabled;
 	}
 
-	p_context->reverb_params = *p_params;
+	memcpy(&p_context->reverb_params, p_params, sizeof(ReverbParameters));
 	xaudio_reverb_set_params(p_context);
 }
 
