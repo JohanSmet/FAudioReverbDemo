@@ -21,7 +21,7 @@ struct AudioContext
 
 	FAudioEffectDescriptor reverb_effect;
 	FAudioEffectChain	   effect_chain;
-	ReverbTestParameters   reverb_params;
+	ReverbParameters	   reverb_params;
 	bool				   reverb_enabled;
 };
 
@@ -195,7 +195,7 @@ void faudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbParamet
 		p_context->reverb_enabled = p_enabled;
 	}
 
-	p_context->reverb_params = *((ReverbTestParameters *) p_params);
+	p_context->reverb_params = *p_params;
 	faudio_reverb_set_params(p_context);
 }
 

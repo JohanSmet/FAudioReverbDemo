@@ -51,7 +51,7 @@ void main_gui()
 		update_effect |= ImGui::Checkbox("Enabled", &effect_enabled);
 		
 		static int preset_index = -1;
-		static ReverbTestParameters reverb_params = {
+		static ReverbParameters reverb_params = {
 			100.0f,
 			40,
 			60,
@@ -70,9 +70,6 @@ void main_gui()
 			2000.0f,
 			50.0f,
 			100.0f,
-			13.28f,
-			28.13f,
-			13.28f,
 		};
 
 		if (ImGui::Combo("Preset", &preset_index, audio_reverb_preset_names, audio_reverb_preset_count)) {
@@ -117,10 +114,6 @@ void main_gui()
 		update_effect |= ImGui::SliderFloat("Density (%)", &reverb_params.Density, 0, 100);
 		update_effect |= ImGui::SliderFloat("RoomSize (feet)", &reverb_params.RoomSize, 1, 100);
 
-		update_effect |= ImGui::SliderFloat("InDiffusionLength1 (ms)", &reverb_params.InDiffusionLength1, 0, 100);
-		update_effect |= ImGui::SliderFloat("InDiffusionLength2 (ms)", &reverb_params.InDiffusionLength2, 0, 100);
-		update_effect |= ImGui::SliderFloat("OutDiffusionLength (ms)", &reverb_params.OutDiffusionLength, 0, 100);
-
 		reverb_params.ReverbDelay = ReverbDelay;
 		reverb_params.EarlyDiffusion = EarlyDiffusion;
 		reverb_params.LateDiffusion = LateDiffusion;
@@ -150,13 +143,8 @@ void main_gui()
 		player.play_wave();
 	}
 
-	if ((update_engine || update_effect) && audio_engine == AudioEngine_XAudio2)
+	if ((update_engine || update_effect))
 	{
-		player.change_effect(effect_enabled, (ReverbParameters *) &reverb_params);
-	}
-
-	if ((update_engine || update_effect) && audio_engine == AudioEngine_FAudio)
-	{
-		player.change_effect_test(effect_enabled, &reverb_params);
+		player.change_effect(effect_enabled, &reverb_params);
 	}
 }

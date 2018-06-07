@@ -49,15 +49,6 @@ class AudioPlayer
 			audio_effect_change(m_context, p_enabled, p_params);
 		}
 
-		void change_effect_test(bool p_enabled, ReverbTestParameters *p_params)
-		{
-			if (m_context == nullptr)
-				return;
-
-			audio_effect_change(m_context, p_enabled, (ReverbParameters *) p_params);
-		}
-
-
 	private : 
 		AudioContext *	m_context;
 };
