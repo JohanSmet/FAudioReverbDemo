@@ -83,6 +83,10 @@ void main_gui()
 	ImGui::Begin("FAudio Tune Detail");
 
 		int ReverbDelay = reverb_params.ReverbDelay;
+		int PositionLeft = reverb_params.PositionLeft;
+		int PositionRight = reverb_params.PositionRight;
+		int PositionMatrixLeft = reverb_params.PositionMatrixLeft;
+		int PositionMatrixRight = reverb_params.PositionMatrixRight;
 		int EarlyDiffusion = reverb_params.EarlyDiffusion;
 		int LateDiffusion = reverb_params.LateDiffusion;
 		int LowEQGain = reverb_params.LowEQGain;
@@ -93,6 +97,11 @@ void main_gui()
 		update_effect |= ImGui::SliderFloat("WetDryMix (%)", &reverb_params.WetDryMix, 0, 100);
 		update_effect |= ImGui::SliderInt("ReflectionsDelay (ms)", (int *)&reverb_params.ReflectionsDelay, 0, 300);
 		update_effect |= ImGui::SliderInt("ReverbDelay (ms)", &ReverbDelay, 0, 85);
+
+		update_effect |= ImGui::SliderInt("PositionLeft", &PositionLeft, 0, 30);
+		update_effect |= ImGui::SliderInt("PositionRight", &PositionRight, 0, 30);
+		update_effect |= ImGui::SliderInt("PositionMatrixLeft", &PositionMatrixLeft, 0, 30);
+		update_effect |= ImGui::SliderInt("PositionMatrixRight", &PositionMatrixRight, 0, 30);
 
 		update_effect |= ImGui::SliderInt("Early Diffusion", &EarlyDiffusion, 0, 15);
 		update_effect |= ImGui::SliderInt("Late Diffusion", &LateDiffusion, 0, 15);
@@ -115,6 +124,10 @@ void main_gui()
 		update_effect |= ImGui::SliderFloat("RoomSize (feet)", &reverb_params.RoomSize, 1, 100);
 
 		reverb_params.ReverbDelay = ReverbDelay;
+		reverb_params.PositionLeft = PositionLeft;
+		reverb_params.PositionRight = PositionRight;
+		reverb_params.PositionMatrixLeft = PositionMatrixLeft;
+		reverb_params.PositionMatrixRight = PositionMatrixRight;
 		reverb_params.EarlyDiffusion = EarlyDiffusion;
 		reverb_params.LateDiffusion = LateDiffusion;
 		reverb_params.LowEQGain = LowEQGain;
