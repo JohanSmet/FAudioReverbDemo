@@ -24,11 +24,13 @@ void main_gui()
 	ImGui::Begin("Output Audio Engine");
 
 		static int audio_engine = (int)AudioEngine_FAudio;
-		update_engine |= ImGui::RadioButton("FAudio", &audio_engine, (int)AudioEngine_FAudio);
+		update_engine |= ImGui::RadioButton("FAudio", &audio_engine, (int)AudioEngine_FAudio); ImGui::SameLine();
 		#ifdef HAVE_XAUDIO2 
-		ImGui::SameLine();
-		update_engine |= ImGui::RadioButton("XAudio2", &audio_engine, (int)AudioEngine_XAudio2); 
+		update_engine |= ImGui::RadioButton("XAudio2", &audio_engine, (int)AudioEngine_XAudio2); ImGui::SameLine();
 		#endif
+
+		static bool output_5p1 = false;
+		update_engine |= ImGui::Checkbox("5.1 channel output", &output_5p1);
 
 	ImGui::End();
 
@@ -144,7 +146,7 @@ void main_gui()
 	if (update_engine)
 	{
 		player.shutdown();
-		player.setup((AudioEngine)audio_engine);
+		player.setup((AudioEngine)audio_engine, output_5p1);
 	}
 
 	if (update_wave | update_engine)

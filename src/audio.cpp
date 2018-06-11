@@ -93,10 +93,10 @@ PFN_AUDIO_WAVE_PLAY audio_wave_play = nullptr;
 
 PFN_AUDIO_EFFECT_CHANGE audio_effect_change = nullptr;
 
-extern AudioContext *xaudio_create_context();
-extern AudioContext *faudio_create_context();
+extern AudioContext *xaudio_create_context(bool output_5p1);
+extern AudioContext *faudio_create_context(bool output_5p1);
 
-AudioContext *audio_create_context(AudioEngine p_engine)
+AudioContext *audio_create_context(AudioEngine p_engine, bool output_5p1)
 {
 	if (audio_reverb_presets == NULL)
 	{
@@ -114,11 +114,11 @@ AudioContext *audio_create_context(AudioEngine p_engine)
 	{
 		#ifdef HAVE_XAUDIO2
 		case AudioEngine_XAudio2:
-			return xaudio_create_context();
+			return xaudio_create_context(output_5p1);
 		#endif
 
 		case AudioEngine_FAudio:
-			return faudio_create_context();
+			return faudio_create_context(output_5p1);
 		
 		default:
 			return nullptr;

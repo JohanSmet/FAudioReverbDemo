@@ -8,12 +8,12 @@ class AudioPlayer
 	public :
 		AudioPlayer() 
 		{
-			setup(AudioEngine_FAudio);
+			setup(AudioEngine_FAudio, false);
 		}
 
-		void setup(AudioEngine p_engine)
+		void setup(AudioEngine p_engine, bool output_5p1)
 		{
-			m_context = audio_create_context(p_engine);
+			m_context = audio_create_context(p_engine, output_5p1);
 		}
 
 		void shutdown()

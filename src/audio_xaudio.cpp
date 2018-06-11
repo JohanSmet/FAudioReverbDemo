@@ -7,6 +7,7 @@
 struct AudioContext 
 {
 	IXAudio2 *xaudio2;
+	uint32_t	output_5p1;
 	IXAudio2MasteringVoice *mastering_voice;
 
 	unsigned int wav_channels;
@@ -44,6 +45,21 @@ void xaudio_destroy_context(AudioContext *p_context)
 
 AudioVoice *xaudio_create_voice(AudioContext *p_context, float *p_buffer, size_t p_buffer_size, int p_sample_rate, int p_num_channels)
 {
+	// create the effect chain
+	IUnknown *xapo = nullptr;
+	HRESULT hr = XAudio2CreateReverb(&xapo);
+
+	if (FAILED(hr))
+		return nullptr;
+
+	// create effect chain
+	p_context->reverb_effect.InitialState = p_context->reverb_enabled;
+	p_context->reverb_effect.OutputChannels = p_context->output_5p1 ? 6 : p_context->wav_channels;
+	p_context->reverb_effect.pEffect = xapo;
+
+	p_context->effect_chain.EffectCount = 1;
+	p_context->effect_chain.pEffectDescriptors = &p_context->reverb_effect;
+
 	// create a source voice
 	WAVEFORMATEX waveFormat;
 	waveFormat.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
@@ -55,12 +71,13 @@ AudioVoice *xaudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 	waveFormat.cbSize = 0;
 
 	IXAudio2SourceVoice *voice;
-	HRESULT hr = p_context->xaudio2->CreateSourceVoice(&voice, &waveFormat, XAUDIO2_VOICE_USEFILTER, XAUDIO2_MAX_FREQ_RATIO);
+	hr = p_context->xaudio2->CreateSourceVoice(&voice, &waveFormat, XAUDIO2_VOICE_USEFILTER, XAUDIO2_MAX_FREQ_RATIO, nullptr, nullptr, &p_context->effect_chain);
+	xapo->Release();
 
 	if (FAILED(hr)) {
 		return nullptr;
 	}
-	
+
 	voice->SetVolume(1.0f);
 
 	// submit the array
@@ -117,32 +134,6 @@ void xaudio_reverb_set_params(AudioContext *context)
 		sizeof(XAUDIO2FX_REVERB_PARAMETERS));
 }
 
-void xaudio_create_reverb(AudioVoice *voice)
-{
-	// create reverb effect
-	IUnknown *xapo = nullptr;
-	HRESULT hr = XAudio2CreateReverb(&xapo);
-
-	if (FAILED(hr))
-		return;
-
-	// create effect chain
-	voice->context->reverb_effect.InitialState = voice->context->reverb_enabled;
-	voice->context->reverb_effect.OutputChannels = voice->context->wav_channels;
-	voice->context->reverb_effect.pEffect = xapo;
-
-	voice->context->effect_chain.EffectCount = 1;
-	voice->context->effect_chain.pEffectDescriptors = &voice->context->reverb_effect;
-
-	// attach to voice
-	hr = voice->voice->SetEffectChain(&voice->context->effect_chain);
-	if (FAILED(hr))
-		return;
-	xapo->Release();
-
-	// set initial parameters
-	xaudio_reverb_set_params(voice->context);
-}
 
 void xaudio_voice_destroy(AudioVoice *p_voice)
 {
@@ -176,7 +167,6 @@ void xaudio_wave_load(AudioContext *p_context, AudioSampleWave sample)
 	p_context->wav_sample_count /= p_context->wav_channels;
 
 	p_context->voice = audio_create_voice(p_context, p_context->wav_samples, p_context->wav_sample_count, p_context->wav_samplerate, p_context->wav_channels);
-	xaudio_create_reverb(p_context->voice);
 }
 
 void xaudio_wave_play(AudioContext *p_context)
@@ -213,7 +203,7 @@ void xaudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbParamet
 }
 
 
-AudioContext *xaudio_create_context()
+AudioContext *xaudio_create_context(bool output_5p1)
 {
 	// setup function pointers
 	audio_destroy_context = xaudio_destroy_context;
@@ -237,13 +227,14 @@ AudioContext *xaudio_create_context()
 	// create a mastering voice
 	IXAudio2MasteringVoice *mastering_voice;
 
-	hr = xaudio2->CreateMasteringVoice(&mastering_voice, 2);
+	hr = xaudio2->CreateMasteringVoice(&mastering_voice, output_5p1 ? 6 : 2);
 	if (FAILED(hr))
 		return nullptr;
 
 	// return a context object
 	AudioContext *context = new AudioContext();
 	context->xaudio2 = xaudio2;
+	context->output_5p1 = output_5p1;
 	context->mastering_voice = mastering_voice;
 	context->voice = NULL;
 	context->wav_samples = NULL;

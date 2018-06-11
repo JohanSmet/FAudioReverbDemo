@@ -88,7 +88,7 @@ typedef void (*PFN_AUDIO_WAVE_PLAY)(AudioContext *p_context);
 typedef void(*PFN_AUDIO_EFFECT_CHANGE)(AudioContext *p_context, bool p_enabled, ReverbParameters *p_params);
 
 // API
-AudioContext *audio_create_context(AudioEngine p_engine);
+AudioContext *audio_create_context(AudioEngine p_engine, bool output_5p1);
 
 extern PFN_AUDIO_DESTROY_CONTEXT audio_destroy_context;
 extern PFN_AUDIO_CREATE_VOICE audio_create_voice;
