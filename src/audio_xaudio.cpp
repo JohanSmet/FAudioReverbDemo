@@ -84,7 +84,32 @@ AudioVoice *xaudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 void xaudio_reverb_set_params(AudioContext *context)
 {
 	XAUDIO2FX_REVERB_PARAMETERS native_params = { 0 };
-	memcpy(&native_params, &context->reverb_params, sizeof(ReverbParameters));
+
+	native_params.WetDryMix = context->reverb_params.WetDryMix;
+	native_params.ReflectionsDelay = context->reverb_params.ReflectionsDelay;
+	native_params.ReverbDelay = context->reverb_params.ReverbDelay;
+	native_params.RearDelay = context->reverb_params.RearDelay;
+	native_params.PositionLeft = context->reverb_params.PositionLeft;
+	native_params.PositionRight = context->reverb_params.PositionRight;
+	native_params.PositionMatrixLeft = context->reverb_params.PositionMatrixLeft;
+	native_params.PositionMatrixRight = context->reverb_params.PositionMatrixRight;
+	native_params.EarlyDiffusion = context->reverb_params.EarlyDiffusion;
+	native_params.LateDiffusion = context->reverb_params.LateDiffusion;
+	native_params.LowEQGain = context->reverb_params.LowEQGain;
+	native_params.LowEQCutoff = context->reverb_params.LowEQCutoff;
+	native_params.HighEQGain = context->reverb_params.HighEQGain;
+	native_params.HighEQCutoff = context->reverb_params.HighEQCutoff;
+	native_params.RoomFilterFreq = context->reverb_params.RoomFilterFreq;
+	native_params.RoomFilterMain = context->reverb_params.RoomFilterMain;
+	native_params.RoomFilterHF = context->reverb_params.RoomFilterHF;
+	native_params.ReflectionsGain = context->reverb_params.ReflectionsGain;
+	native_params.ReverbGain = context->reverb_params.ReverbGain;
+	native_params.DecayTime = context->reverb_params.DecayTime;
+	native_params.Density = context->reverb_params.Density;
+	native_params.RoomSize = context->reverb_params.RoomSize;
+
+	/* 2.8+ only but zero-initialization catches this 
+	native_params.DisableLateField = 0; */
 
 	HRESULT hr = context->voice->voice->SetEffectParameters(
 		0, 
