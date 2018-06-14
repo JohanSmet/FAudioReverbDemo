@@ -12,6 +12,13 @@ const char *audio_sample_filenames[] =
 	"resources/snaredrum_mezzoforte.wav",
 };
 
+const char *audio_stereo_filenames[] =
+{
+	"resources/snaredrum_forte_stereo.wav",
+	"resources/snaredrum_fortissimo_stereo.wav",
+	"resources/snaredrum_mezzoforte_stereo.wav",
+};
+
 const char *audio_reverb_preset_names[] = 
 {
 	"Generic",

@@ -54,7 +54,7 @@ AudioVoice *xaudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 
 	// create effect chain
 	p_context->reverb_effect.InitialState = p_context->reverb_enabled;
-	p_context->reverb_effect.OutputChannels = p_context->output_5p1 ? 6 : p_context->wav_channels;
+	p_context->reverb_effect.OutputChannels = (p_context->output_5p1) ? 6 : p_context->wav_channels;
 	p_context->reverb_effect.pEffect = xapo;
 
 	p_context->effect_chain.EffectCount = 1;
@@ -151,7 +151,7 @@ void xaudio_voice_set_frequency(AudioVoice *p_voice, float p_frequency)
 	p_voice->voice->SetFrequencyRatio(p_frequency);
 }
 
-void xaudio_wave_load(AudioContext *p_context, AudioSampleWave sample)
+void xaudio_wave_load(AudioContext *p_context, AudioSampleWave sample, bool stereo)
 {
 	if (p_context->voice)
 	{
@@ -159,7 +159,7 @@ void xaudio_wave_load(AudioContext *p_context, AudioSampleWave sample)
 	}
 
 	p_context->wav_samples = drwav_open_and_read_file_f32(
-		audio_sample_filenames[sample],
+		(!stereo) ? audio_sample_filenames[sample] : audio_stereo_filenames[sample],
 		&p_context->wav_channels,
 		&p_context->wav_samplerate,
 		&p_context->wav_sample_count);
@@ -167,6 +167,7 @@ void xaudio_wave_load(AudioContext *p_context, AudioSampleWave sample)
 	p_context->wav_sample_count /= p_context->wav_channels;
 
 	p_context->voice = audio_create_voice(p_context, p_context->wav_samples, p_context->wav_sample_count, p_context->wav_samplerate, p_context->wav_channels);
+	xaudio_reverb_set_params(p_context);
 }
 
 void xaudio_wave_play(AudioContext *p_context)
@@ -242,7 +243,7 @@ AudioContext *xaudio_create_context(bool output_5p1)
 	context->reverb_enabled = false;
 
 	// load the first wave
-	audio_wave_load(context, (AudioSampleWave) 0);
+	audio_wave_load(context, (AudioSampleWave) 0, false);
 
 	return context;
 }

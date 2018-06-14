@@ -112,7 +112,6 @@ AudioVoice *faudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 	p_context->silence.LoopLength = 0;
 	p_context->silence.LoopCount = 0;
 
-
 	// return a voice struct
 	AudioVoice *result = new AudioVoice();
 	result->context = p_context;
@@ -140,7 +139,7 @@ void faudio_voice_set_frequency(AudioVoice *p_voice, float p_frequency)
 	FAudioSourceVoice_SetFrequencyRatio(p_voice->voice, p_frequency, FAUDIO_COMMIT_NOW);
 }
 
-void faudio_wave_load(AudioContext *p_context, AudioSampleWave sample)
+void faudio_wave_load(AudioContext *p_context, AudioSampleWave sample, bool stereo)
 {
 	if (p_context->voice)
 	{
@@ -148,7 +147,7 @@ void faudio_wave_load(AudioContext *p_context, AudioSampleWave sample)
 	}
 
 	p_context->wav_samples = drwav_open_and_read_file_f32(
-		audio_sample_filenames[sample],
+		(!stereo) ? audio_sample_filenames[sample] : audio_stereo_filenames[sample],
 		&p_context->wav_channels,
 		&p_context->wav_samplerate,
 		&p_context->wav_sample_count);
@@ -156,6 +155,7 @@ void faudio_wave_load(AudioContext *p_context, AudioSampleWave sample)
 	p_context->wav_sample_count /= p_context->wav_channels;
 
 	p_context->voice = audio_create_voice(p_context, p_context->wav_samples, p_context->wav_sample_count, p_context->wav_samplerate, p_context->wav_channels);
+	faudio_reverb_set_params(p_context);
 }
 
 void faudio_wave_play(AudioContext *p_context)
@@ -227,7 +227,7 @@ AudioContext *faudio_create_context(bool output_5p1)
 	context->reverb_enabled = false;
 
 	// load the first wave
-	audio_wave_load(context, (AudioSampleWave) 0);
+	audio_wave_load(context, (AudioSampleWave) 0, false);
 
 	return context;
 }

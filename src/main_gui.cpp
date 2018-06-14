@@ -38,11 +38,14 @@ void main_gui()
 	ImGui::Begin("Wave file to play");
 
 		static int wave_index = (int)AudioWave_SnareDrum01;
+		static bool wave_stereo = false;
+
 		update_wave |= ImGui::RadioButton("Snare Drum (Forte)", &wave_index, (int)AudioWave_SnareDrum01); ImGui::SameLine();
 		update_wave |= ImGui::RadioButton("Snare Drum (Fortissimo)", &wave_index, (int)AudioWave_SnareDrum02); ImGui::SameLine();
 		update_wave |= ImGui::RadioButton("Snare Drum (Mezzo-Forte)", &wave_index, (int)AudioWave_SnareDrum03); 
 
-		play_wave = ImGui::Button("Play");
+		play_wave = ImGui::Button("Play"); ImGui::SameLine();
+		update_wave |= ImGui::Checkbox("Stereo", &wave_stereo);
 		
 	ImGui::End();
 
@@ -151,7 +154,7 @@ void main_gui()
 
 	if (update_wave | update_engine)
 	{
-		player.load_wave_sample((AudioSampleWave) wave_index);
+		player.load_wave_sample((AudioSampleWave) wave_index, wave_stereo);
 	}
 
 	if (play_wave) {

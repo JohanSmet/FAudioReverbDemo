@@ -25,12 +25,12 @@ class AudioPlayer
 			m_context = nullptr;
 		}
 		
-		void load_wave_sample(AudioSampleWave sample)
+		void load_wave_sample(AudioSampleWave sample, bool stereo)
 		{
 			if (m_context == nullptr)
 				return;
 			
-			audio_wave_load(m_context, sample);
+			audio_wave_load(m_context, sample, stereo);
 		}
 
 		void play_wave()

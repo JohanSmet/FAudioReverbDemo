@@ -70,6 +70,7 @@ struct ReverbParameters
 #pragma pack(pop)
 
 extern const char *audio_sample_filenames[];
+extern const char *audio_stereo_filenames[];
 extern const char *audio_reverb_preset_names[];
 extern const ReverbI3DL2Parameters audio_reverb_presets_i3dl2[];
 extern const ReverbParameters	   *audio_reverb_presets;
@@ -82,7 +83,7 @@ typedef void (*PFN_AUDIO_VOICE_DESTROY)(AudioVoice *p_voice);
 typedef void (*PFN_AUDIO_VOICE_SET_VOLUME)(AudioVoice *p_voice, float p_volume);
 typedef void (*PFN_AUDIO_VOICE_SET_FREQUENCY)(AudioVoice *p_vioce, float p_frequency);
 
-typedef void (*PFN_AUDIO_WAVE_LOAD)(AudioContext *p_context, AudioSampleWave sample);
+typedef void (*PFN_AUDIO_WAVE_LOAD)(AudioContext *p_context, AudioSampleWave sample, bool stereo);
 typedef void (*PFN_AUDIO_WAVE_PLAY)(AudioContext *p_context);
 
 typedef void(*PFN_AUDIO_EFFECT_CHANGE)(AudioContext *p_context, bool p_enabled, ReverbParameters *p_params);
