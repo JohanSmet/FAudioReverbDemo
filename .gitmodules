@@ -1,4 +1,4 @@
 [submodule "libs/FACT"]
 	path = libs/FACT
-	url = git@github.com:JohanSmet/FACT.git
+	url = https://github.com/flibitijibibo/FACT.git
 	branch = reverb
