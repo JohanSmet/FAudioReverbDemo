@@ -121,7 +121,7 @@ AudioVoice *faudio_create_voice(AudioContext *p_context, float *p_buffer, size_t
 
 void faudio_reverb_set_params(AudioContext *context)
 {
-	uint32_t hr = FAudioVoice_SetEffectParameters(context->voice->voice, 0, &context->reverb_params, sizeof(context->reverb_params), FAUDIO_COMMIT_NOW);
+	FAudioVoice_SetEffectParameters(context->voice->voice, 0, &context->reverb_params, sizeof(context->reverb_params), FAUDIO_COMMIT_NOW);
 }
 
 void faudio_voice_destroy(AudioVoice *p_voice)
@@ -170,16 +170,14 @@ void faudio_wave_play(AudioContext *p_context)
 
 void faudio_effect_change(AudioContext *p_context, bool p_enabled, ReverbParameters *p_params)
 {
-	uint32_t hr;
-
 	if (p_context->reverb_enabled && !p_enabled)
 	{
-		hr = FAudioVoice_DisableEffect(p_context->voice->voice, 0, FAUDIO_COMMIT_NOW);
+		FAudioVoice_DisableEffect(p_context->voice->voice, 0, FAUDIO_COMMIT_NOW);
 		p_context->reverb_enabled = p_enabled;
 	}
 	else if (!p_context->reverb_enabled && p_enabled)
 	{
-		hr = FAudioVoice_EnableEffect(p_context->voice->voice, 0, FAUDIO_COMMIT_NOW);
+		FAudioVoice_EnableEffect(p_context->voice->voice, 0, FAUDIO_COMMIT_NOW);
 		p_context->reverb_enabled = p_enabled;
 	}
 

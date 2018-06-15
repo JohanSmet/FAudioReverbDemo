@@ -109,7 +109,7 @@ AudioContext *audio_create_context(AudioEngine p_engine, bool output_5p1)
 	{
 		audio_reverb_presets = new ReverbParameters[audio_reverb_preset_count];
 
-		for (int idx = 0; idx < audio_reverb_preset_count; ++idx)
+		for (size_t idx = 0; idx < audio_reverb_preset_count; ++idx)
 		{
 			ReverbConvertI3DL2ToNative(
 				(const FAudioFXReverbI3DL2Parameters *) &audio_reverb_presets_i3dl2[idx], 
