@@ -9,3 +9,4 @@ visualc/x64/
 imgui.ini
 SDL2.dll
 *.o
+libs/SDL2
