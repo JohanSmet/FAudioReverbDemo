@@ -1,5 +1,9 @@
 # FAudio Reverb Demo 
 
+## Notice
+This has been merged into the official [FAudio](https://github.com/flibitijibibo/FACT) repository. This repository will probably no longer be maintained.
+
+## Intro
 A small demo application to test the Reverb APO effect in FAudio, an accuracy-focused XAudio reimplementation for open platforms.
 
 ## License
